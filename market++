@@ -1,0 +1,379 @@
+#include <stdio.h>
+#include <string.h>
+
+#define MAX_PRODUTOS 100
+#define MAX_FILIAIS 100
+#define TRIMESTRES 4
+
+// Função para inicializar a matriz tridimensional
+void inicializar(int produtos, int filiais, int vendas[produtos][TRIMESTRES][filiais]) {
+    for (int i = 0; i < produtos; i++) {
+        for (int j = 0; j < TRIMESTRES; j++) {
+            for (int k = 0; k < filiais; k++) {
+                vendas[i][j][k] = 0;
+            }
+        }
+    }
+}
+
+// Função para encontrar o produto mais vendido para uma filial e trimestre específico
+int encontrarProdutoMaisVendido(int produtos, int filiais, int vendas[produtos][TRIMESTRES][filiais], int filial, int trimestre) {
+    int indiceMelhorProduto = -1;
+    int maxVendas = -1;
+    
+    for (int i = 0; i < produtos; i++) {
+        int vendasProduto = 0;
+        for (int j = 0; j < filiais; j++) {
+            vendasProduto += vendas[i][trimestre - 1][j];
+        }
+        
+        if (vendasProduto > maxVendas) {
+            maxVendas = vendasProduto;
+            indiceMelhorProduto = i;
+        }
+    }
+    
+    return indiceMelhorProduto;
+}
+
+// Função para encontrar a filial que vende mais produtos em um trimestre específico
+int encontrarFilialMaisVendendo(int produtos, int filiais, int vendas[produtos][TRIMESTRES][filiais], int trimestre) {
+    int indiceMelhorFilial = -1;
+    int maxVendas = -1;
+    
+    for (int i = 0; i < filiais; i++) {
+        int vendasFilial = 0;
+        for (int j = 0; j < produtos; j++) {
+            vendasFilial += vendas[j][trimestre - 1][i];
+        }
+        
+        if (vendasFilial > maxVendas) {
+            maxVendas = vendasFilial;
+            indiceMelhorFilial = i;
+        }
+    }
+    
+    return indiceMelhorFilial;
+}
+
+// Função para encontrar o produto mais vendido globalmente
+int encontrarProdutoMaisVendidoGlobal(int produtos, int filiais, int vendas[produtos][TRIMESTRES][filiais]) {
+    int indiceMelhorProduto = -1;
+    int maxVendas = -1;
+    
+    for (int i = 0; i < produtos; i++) {
+        int vendasProduto = 0;
+        for (int j = 0; j < filiais; j++) {
+            for (int k = 0; k < TRIMESTRES; k++) {
+                vendasProduto += vendas[i][k][j];
+            }
+        }
+        
+        if (vendasProduto > maxVendas) {
+            maxVendas = vendasProduto;
+            indiceMelhorProduto = i;
+        }
+    }
+    
+    return indiceMelhorProduto;
+}
+
+// Função para encontrar a filial que vende mais produtos globalmente
+int encontrarFilialMaisVendendoGlobal(int produtos, int filiais, int vendas[produtos][TRIMESTRES][filiais]) {
+    int indiceMelhorFilial = -1;
+    int maxVendas = -1;
+    
+    for (int i = 0; i < filiais; i++) {
+        int vendasFilial = 0;
+        for (int j = 0; j < produtos; j++) {
+            for (int k = 0; k < TRIMESTRES; k++) {
+                vendasFilial += vendas[j][k][i];
+            }
+        }
+        
+        if (vendasFilial > maxVendas) {
+            maxVendas = vendasFilial;
+            indiceMelhorFilial = i;
+        }
+    }
+    
+    return indiceMelhorFilial;
+}
+
+// Função para encontrar o trimestre com mais vendas globalmente
+int encontrarMelhorTrimestre(int produtos, int filiais, int vendas[produtos][TRIMESTRES][filiais]) {
+    int melhorTrimestre = -1;
+    int maxVendas = -1;
+    
+    for (int i = 0; i < TRIMESTRES; i++) {
+        int vendasTrimestre = 0;
+        for (int j = 0; j < produtos; j++) {
+            for (int k = 0; k < filiais; k++) {
+                vendasTrimestre += vendas[j][i][k];
+            }
+        }
+        
+        if (vendasTrimestre > maxVendas) {
+            maxVendas = vendasTrimestre;
+            melhorTrimestre = i + 1;
+        }
+    }
+    
+    return melhorTrimestre;
+}
+
+int main() {
+    //setlocale(LC_ALL,NULL);
+    int produtos, filiais;
+    int trimestre;
+    char nomeProduto[100];
+    char nomeFilial[100];
+    printf("Bem-vindo ao Sistema de Gestão de Vendas da Market++\n");
+    printf("1. Inicialização do Sistema\n");
+    printf("Informe o número de produtos: ");
+    scanf("%d", &produtos);
+    printf("Informe o número de filiais: ");
+    scanf("%d", &filiais);
+    
+    char catalogoProdutos[MAX_PRODUTOS][100];
+    char catalogoFiliais[MAX_FILIAIS][100];
+    int vendas[produtos][TRIMESTRES][filiais];
+    
+    inicializar(produtos, filiais, vendas);
+    
+    int escolha;
+    
+    while (1) {
+        printf("\nMenu:\n");
+        printf("1. Inicializacao do Sistema\n");
+        printf("2. Catálogo do Sistema\n");
+        printf("3. Catálogo de Filiais\n");
+        printf("4. Inserir Vendas de um Produto/Trimestre\n");
+        printf("5. Inserir Vendas de um Produto/Filial\n");
+        printf("6. Produto mais vendido por filial\n");
+        printf("7. Filial que vende mais produtos\n");
+        printf("8. Produto mais vendido\n");
+        printf("9. Filial que vende mais\n");
+        printf("10. Melhor trimestre\n");
+        printf("11. Inserir novo produto\n");
+        printf("12. Inserir nova filial\n");
+        printf("13. Remover produto\n");
+        printf("14. Sair\n");
+        printf("Informe sua escolha: ");
+        scanf("%d", &escolha);
+        
+        switch (escolha) {
+            case 1:
+                // Inicialização do Sistema
+                printf("Sistema inicializado com %d produtos e %d filiais.\n", produtos, filiais);
+                break;
+            case 2:
+                // Catálogo do Sistema
+                printf("Informe os nomes dos %d produtos:\n", produtos);
+                for (int i = 0; i < produtos; i++) {
+                    printf("Produto %d: ", i + 1);
+                    scanf("%s", catalogoProdutos[i]);
+                }
+                break;
+            case 3:
+                // Catálogo de Filiais
+                printf("Informe os nomes das %d filiais:\n", filiais);
+                for (int i = 0; i < filiais; i++) {
+                    printf("Filial %d: ", i + 1);
+                    scanf("%s", catalogoFiliais[i]);
+                }
+                break;
+            case 4:
+                // Inserir Vendas de um Produto/Trimestre
+                printf("Informe o trimestre (1, 2, 3 ou 4): ");
+                scanf("%d", &trimestre);
+                printf("Informe o nome do produto: ");
+                scanf("%s", &nomeProduto);
+                
+                int indiceProduto = -1;
+                for (int i = 0; i < produtos; i++) {
+                    if (strcmp(nomeProduto, catalogoProdutos[i]) == 0) {
+                        indiceProduto = i;
+                        break;
+                    }
+                }
+                if (indiceProduto == -1) {
+                    printf("Produto não encontrado no catálogo.\n");
+                    break;
+                }
+                
+                for (int i = 0; i < filiais; i++) {
+                    int venda;
+                    printf("Informe as vendas para %s na filial %s no Trimestre %d: ", nomeProduto, catalogoFiliais[i], trimestre);
+                    scanf("%d", &venda);
+                    vendas[indiceProduto][trimestre - 1][i] += venda;
+                }
+                printf("Dados de vendas atualizados com sucesso.\n");
+                break;
+            case 5:
+                // Inserir Vendas de um Produto/Filial
+                
+                printf("Informe o nome da filial: ");
+                scanf("%s", nomeFilial);
+                printf("Informe o nome do produto: ");
+                scanf("%s", nomeProduto);
+                
+                int indiceFilial = -1;
+                for (int i = 0; i < filiais; i++) {
+                    if (strcmp(nomeFilial, catalogoFiliais[i]) == 0) {
+                        indiceFilial = i;
+                        break;
+                    }
+                }
+                if (indiceFilial == -1) {
+                    printf("Filial não encontrada no catálogo.\n");
+                    break;
+                }
+                
+                indiceProduto = -1;
+                for (int i = 0; i < produtos; i++) {
+                    if (strcmp(nomeProduto, catalogoProdutos[i]) == 0) {
+                        indiceProduto = i;
+                        break;
+                    }
+                }
+                if (indiceProduto == -1) {
+                    printf("Produto não encontrado no catálogo.\n");
+                    break;
+                }
+                
+                for (int i = 0; i < TRIMESTRES; i++) {
+                    int venda;
+                    printf("Informe as vendas para %s na filial %s no Trimestre %d: ", nomeProduto, nomeFilial, i + 1);
+                    scanf("%d", &venda);
+                    vendas[indiceProduto][i][indiceFilial] += venda;
+                }
+                printf("Dados de vendas atualizados com sucesso.\n");
+                break;
+            case 6:
+                // Produto mais vendido por filial
+                printf("Informe o nome da filial: ");
+                scanf("%s", nomeFilial);
+                
+                indiceFilial = -1;
+                for (int i = 0; i < filiais; i++) {
+                    if (strcmp(nomeFilial, catalogoFiliais[i]) == 0) {
+                        indiceFilial = i;
+                        break;
+                    }
+                }
+                if (indiceFilial == -1) {
+                    printf("Filial não encontrada no catálogo.\n");
+                    break;
+                }
+                
+                printf("Informe o trimestre (1, 2, 3 ou 4): ");
+                scanf("%d", &trimestre);
+                
+                if (trimestre < 1 || trimestre > 4) {
+                    printf("Trimestre inválido. Informe um trimestre válido (1, 2, 3 ou 4).\n");
+                    break;
+                }
+                
+                indiceProduto = encontrarProdutoMaisVendido(produtos, filiais, vendas, indiceFilial, trimestre);
+                printf("Produto mais vendido na filial %s no Trimestre %d: %s\n", nomeFilial, trimestre, catalogoProdutos[indiceProduto]);
+                break;
+            case 7:
+                // Filial que vende mais produtos
+                printf("Informe o trimestre (1, 2, 3 ou 4): ");
+                scanf("%d", &trimestre);
+                
+                if (trimestre < 1 || trimestre > 4) {
+                    printf("Trimestre inválido. Informe um trimestre válido (1, 2, 3 ou 4).\n");
+                    break;
+                }
+                
+                indiceFilial = encontrarFilialMaisVendendo(produtos, filiais, vendas, trimestre);
+                printf("Filial que vende mais produtos no Trimestre %d: %s\n", trimestre, catalogoFiliais[indiceFilial]);
+                break;
+            case 8:
+                // Produto mais vendido
+                indiceProduto = encontrarProdutoMaisVendidoGlobal(produtos, filiais, vendas);
+                printf("Produto mais vendido globalmente: %s\n", catalogoProdutos[indiceProduto]);
+                break;
+            case 9:
+                // Filial que vende mais
+                indiceFilial = encontrarFilialMaisVendendoGlobal(produtos, filiais, vendas);
+                printf("Filial que vende mais produtos globalmente: %s\n", catalogoFiliais[indiceFilial]);
+                break;
+            case 10:
+                // Melhor trimestre
+                trimestre = encontrarMelhorTrimestre(produtos, filiais, vendas);
+                printf("Melhor trimestre com mais vendas: Trimestre %d\n", trimestre);
+                break;
+            case 11:
+                // Inserir novo produto
+                if (produtos < MAX_PRODUTOS) {
+                    printf("Informe o nome do novo produto: ");
+                    scanf("%s", catalogoProdutos[produtos]);
+                    for (int i = 0; i < filiais; i++) {
+                        for (int j = 0; j < TRIMESTRES; j++) {
+                            vendas[produtos][j][i] = 0;
+                        }
+                    }
+                    produtos++;
+                    printf("Novo produto adicionado ao catálogo.\n");
+                } else {
+                    printf("Número máximo de produtos atingido. Não é possível adicionar mais produtos.\n");
+                }
+                break;
+            case 12:
+                // Inserir nova filial
+                if (filiais < MAX_FILIAIS) {
+                    printf("Informe o nome da nova filial: ");
+                    scanf("%s", catalogoFiliais[filiais]);
+                    for (int i = 0; i < produtos; i++) {
+                        for (int j = 0; j < TRIMESTRES; j++) {
+                            vendas[i][j][filiais] = 0;
+                        }
+                    }
+                    filiais++;
+                    printf("Nova filial adicionada ao catálogo.\n");
+                } else {
+                    printf("Número máximo de filiais atingido. Não é possível adicionar mais filiais.\n");
+                }
+                break;
+            case 13:
+                // Remover produto
+                printf("Informe o nome do produto a ser removido: ");
+                scanf("%s", nomeProduto);
+                
+                indiceProduto = -1;
+                for (int i = 0; i < produtos; i++) {
+                    if (strcmp(nomeProduto, catalogoProdutos[i]) == 0) {
+                        indiceProduto = i;
+                        break;
+                    }
+                }
+                if (indiceProduto == -1) {
+                    printf("Produto não encontrado no catálogo.\n");
+                    break;
+                }
+                
+                for (int i = indiceProduto; i < produtos - 1; i++) {
+                    strcpy(catalogoProdutos[i], catalogoProdutos[i + 1]);
+                    for (int j = 0; j < filiais; j++) {
+                        for (int k = 0; k < TRIMESTRES; k++) {
+                            vendas[i][k][j] = vendas[i + 1][k][j];
+                        }
+                    }
+                }
+                
+                produtos--;
+                printf("Produto removido do catálogo.\n");
+                break;
+            case 14:
+                // Sair
+                return 0;
+            default:
+                printf("Escolha inválida. Tente novamente.\n");
+        }
+    }
+    
+    return 0;
+}
